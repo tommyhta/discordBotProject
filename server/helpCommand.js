@@ -21,8 +21,12 @@ module.exports = {
                     value:"When this command is used by itself, a random pokemon will be chosen for you.\n `~pokemon <name/id>` will return a specific pokemon"
                 },
                 {
-                    name:"```~weather <parameter>```",
+                    name:"```~weather <location>```",
                     value:"This command will take either a zipcode, city, or city and country code combination.\ne.g. ~weather 95121, ~weather san jose, or ~weather tokyo, jp"
+                },
+                {
+                    name:"```~yelp <location>```",
+                    value:"This command will take either a zipcode or a city and return a random restaurant in that area.\n A search term can also be used after the location and seperated by a comma to narrow down searches. \ne.g ~yelp san jose or ~yelp san jose, korean bbq"
                 }
             ]
         }}
