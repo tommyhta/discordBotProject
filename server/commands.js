@@ -1,5 +1,6 @@
 const fetch = require("node-fetch");
 const secret = require("../config/secret.json")
+const Discord = require("discord.js")
 
 module.exports = {
  
@@ -22,7 +23,7 @@ module.exports = {
             }catch(err){console.log(err)}
         }
     },
-    
+
     pokemonCommand : function(msg, argument){
         let uri = 'https://pokeapi.co/api/v2/'
         if(argument.length < 1){
@@ -92,6 +93,32 @@ module.exports = {
                     msg.channel.send("```You entered: "+argument+", which isn't a real zipcode.```")
                 })
         }
+    },
+
+    yelpCommand : function(msg, argument){
+        let uri = "https://api.yelp.com/v3/businesses/search?limit=20";
+        let key = secret.yelpAPI;
+        let arg = formatCommand(argument);
+        let splitArg = arg.split(',');
+        let location = splitArg[0];
+        let term = splitArg.slice(1)
+        if(!term || term.length<1){
+            term = "food"
+        }
+        fetch(uri+"&location="+location+"&term="+term, {
+            method: "GET",
+            headers:{
+                'Authorization': "Bearer "+key
+            }
+        })
+            .then((response)=>{
+                if(response.ok){return response.json()
+                    .then((json)=>{
+                        replyYelp(json, msg);
+                    })
+                }
+                msg.channel.send("```Something went wrong, you must have a location to continue.\nPlease try again using format ~yelp <location>,<search term>\ne.g. ~yelp san jose or ~yelp san jose, japanese food```")
+            })
     }
 }
 
@@ -99,6 +126,14 @@ module.exports = {
 function kelvinToF(kelvin){
     let temp = (kelvin - 273.15)*9/5 + 32
     return temp
+}
+
+function formatCommand(arg){
+    let str = '';
+    for(var i = 0; i<arg.length; i++){
+        str+=arg[i]+" "
+    }
+    return str
 }
 
 function replyWeather(json, msg){
@@ -122,15 +157,74 @@ function replyWeather(json, msg){
                     +"\nHumidity: "+json['main']['humidity']+"%"
                     +"**"
                 },                                   
-            ]
+            ],
+            footer:{
+                icon_url: 'https://imgur.com/IrQqBQT.png',
+                text:"Powered by OpenWeatherMap"
+            }
         }}
     )
 }
 
-function formatCommand(arg){
-    let str = '';
-    for(var i = 0; i<arg.length; i++){
-        str+=arg[i]+" "
+function replyYelp(json, msg){
+    let length = json['businesses'].length;
+    let n = Math.floor(Math.random()*length);
+    let rest = json['businesses'][n];
+    let imgRating = yelpRating(rest['rating'])
+
+    const embed = new Discord.RichEmbed()
+        .setTitle("**"+rest['name']+"**")
+        .setURL(rest['url'])
+        .setColor(3447003)
+        .setDescription(
+            "**"
+            +"("+rest['review_count']+" reviews)"
+            +"\n\n"+rest['location']['address1']
+            +"\n"+rest['location']['address2']
+            +"\n"+rest['location']['city']+", "+rest['location']['state']+" "+rest['location']['zip_code']
+            +"\n"+rest['display_phone']
+            +"**"
+        )
+        .setThumbnail(imgRating)
+        .setImage(rest['image_url'])
+        .setFooter("Powered by Yelp","https://i.imgur.com/GU9gVal.png")
+
+    msg.channel.send({embed})
+}
+
+function yelpRating(n){
+    imgUrl = '';
+    switch(n){
+        case 0:
+            imgUrl = "https://i.imgur.com/uLDUaw8.png";
+            break;
+        case 1:
+            imgUrl = "https://i.imgur.com/gwmUHUy.png"
+            break;
+        case 1.5:
+            imgUrl = "https://i.imgur.com/G1bfo3F.png";
+            break;
+        case 2:
+            imgUrl = "https://imgur.com/gDN3pdN.png";
+            break;
+        case 2.5:
+            imgUrl = "https://imgur.com/IxE8yaX.png";
+            break;
+        case 3:
+            imgUrl = "https://imgur.com/UdkMz6g.png";
+            break;
+        case 3.5:
+            imgUrl = "https://imgur.com/CwbfFQK.png";
+            break;
+        case 4:
+            imgUrl = "https://imgur.com/CEhIPov.png";
+            break;
+        case 4.5:
+            imgUrl = "https://i.imgur.com/53xR9dZ.png";
+            break;
+        case 5:
+            imgUrl = "https://i.imgur.com/wRhspXo.png";
+            break
     }
-    return str
+    return imgUrl
 }

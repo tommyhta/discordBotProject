@@ -22,6 +22,8 @@ module.exports = {
                 return Commands.pokemonCommand(msg, argument);
             case "weather":
                 return Commands.weatherCommand(msg, addArg);
+            case "yelp":
+                return Commands.yelpCommand(msg, addArg);
         }
     }
 
