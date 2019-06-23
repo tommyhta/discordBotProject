@@ -19,4 +19,9 @@ client.on('message', (msg) =>{
     if(msg.content.startsWith("~")){
         Messages.processCommand(msg);
     }
+    if(msg.mentions){
+        if(msg.mentions.members.get("367805965480886275")!=null){
+            msg.channel.send("What did you need my master for?");
+        }
+    }
 })

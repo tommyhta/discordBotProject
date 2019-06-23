@@ -10,7 +10,7 @@ module.exports = {
     rollCommand : function(msg){
         let n1 = Math.floor(Math.random()*6)+1; // randomly generate a number between 1 and 6 
         let n2 = Math.floor(Math.random()*6)+1;
-        msg.channel.send("\u{1F3B2} "+msg.member.displayName+" rolled a " + n1 + " and " + n2 + ".\nThe total is **"+(n1+n2)+"**.")
+        msg.channel.send("\u{1F3B2} **"+msg.member.displayName+"** rolled " + n1 + " and " + n2 + ".\nThe total is **"+(n1+n2)+"**.")
     },
 
     //simple coin toss function
@@ -18,7 +18,7 @@ module.exports = {
         let face = '';
         let n = Math.floor(Math.random()*2); //randomly return 0 or 1
         n==0 ? face="head":face="tail" // if 0, it's head, otherwise, it's tail
-        msg.channel.send(""+msg.member.displayName+" flipped a coin and got **"+face+"**!")
+        msg.channel.send("**"+msg.member.displayName+"** flipped a coin and got **"+face+"**!")
     },
 
     // function to call magic 8 ball API
