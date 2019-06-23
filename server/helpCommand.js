@@ -13,6 +13,10 @@ module.exports = {
                     value:"This will roll two dice, each with values between 1 and 6."
                 },
                 {
+                    name:"```~coin```",
+                    value:"This will flip a coin and return head or tail."
+                },
+                {
                     name: "```~8ball <question>```",
                     value:"Use this command to ask the magic eight ball a question."
                 },

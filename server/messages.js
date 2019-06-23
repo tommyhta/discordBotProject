@@ -16,6 +16,8 @@ module.exports = {
                 return Help.helpCommand(msg);
             case "roll":
                 return Commands.rollCommand(msg);
+            case "coin":
+                return Commands.coinCommand(msg);
             case "8ball":
                 return Commands.magicBall(msg, argument);
             case "pokemon":
