@@ -7,7 +7,14 @@ module.exports = {
     rollCommand : function(msg){
         let n1 = Math.floor(Math.random()*6)+1;
         let n2 = Math.floor(Math.random()*6)+1;
-        msg.channel.send("```\u{1F3B2} You rolled a " + n1 + " and " + n2 + ".\nYour total is "+(n1+n2)+".```")
+        msg.channel.send("```\u{1F3B2} "+msg.author.username+" rolled a " + n1 + " and " + n2 + ".\nThe total is "+(n1+n2)+".```")
+    },
+
+    coinCommand : function(msg){
+        let face = '';
+        let n = Math.floor(Math.random()*2);
+        n==0 ? face="head":face="tail"
+        msg.channel.send("```"+msg.author.username+" flipped a coin and got "+face+"!```")
     },
 
     magicBall : function(msg, argument){
@@ -146,16 +153,15 @@ function replyWeather(json, msg){
         {embed:{
             color: 3447003,
             title:"__**Weather Report**__",
-            description:"**City: "+city+"\nCountry: "+country+"**",
+            description:"City: "+city+"\nCountry: "+country+"",
             fields:[
                 {
                     name:"__**Details:**__",
-                    value:"**Condition: "+json['weather'][0]['main']
+                    value:"Condition: "+json['weather'][0]['main']
                     +"\nTemperature: "+temp+"\u{00B0}F"
                     +"\nLow: "+tempLow+"\u{00B0}F"
                     +"\nHigh: "+tempHigh+"\u{00B0}F"
                     +"\nHumidity: "+json['main']['humidity']+"%"
-                    +"**"
                 },                                   
             ],
             footer:{
@@ -177,13 +183,10 @@ function replyYelp(json, msg){
         .setURL(rest['url'])
         .setColor(3447003)
         .setDescription(
-            "**"
-            +"("+rest['review_count']+" reviews)"
+            "("+rest['review_count']+" reviews)"
             +"\n\n"+rest['location']['address1']
-            +"\n"+rest['location']['address2']
             +"\n"+rest['location']['city']+", "+rest['location']['state']+" "+rest['location']['zip_code']
             +"\n"+rest['display_phone']
-            +"**"
         )
         .setThumbnail(imgRating)
         .setImage(rest['image_url'])
