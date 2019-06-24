@@ -2,11 +2,22 @@ const fetch = require("node-fetch");
 const Utility = require("./utility")
 const secret = require("../config/secret.json")
 
+const log4js = require('log4js');
+log4js.configure({
+    appenders:{
+        commands :{type : 'file', filename: 'application.log', flags : "w", maxLogSize: 10485760, backups: 2, compress: true}
+    },
+    categories :{
+        default: { appenders: ["commands"], level: 'info'}
+    }
+})
+const logger = log4js.getLogger('commands')
 
 module.exports = {
  
     //simple dice toss
     rollCommand : function(msg){
+        logger.info("~roll initiated")
         let n1 = Math.floor(Math.random()*6)+1; // randomly generate a number between 1 and 6 
         let n2 = Math.floor(Math.random()*6)+1;
         msg.channel.send("\u{1F3B2} **"+msg.member.displayName+"** rolled " + n1 + " and " + n2 + ".\nThe total is **"+(n1+n2)+"**.")
@@ -14,6 +25,7 @@ module.exports = {
 
     //simple coin toss function
     coinCommand : function(msg){
+        logger.info("~coin initiated")
         let face = '';
         let n = Math.floor(Math.random()*2); //randomly return 0 or 1
         n==0 ? face="head":face="tail" // if 0, it's head, otherwise, it's tail
@@ -22,56 +34,47 @@ module.exports = {
 
     // function to call magic 8 ball API
     magicBall : function(msg, argument){
-        if(argument.length < 1){
-            msg.channel.send("You need to ask magic eight ball a question to get an answer.") //an argument (question) is required, although the actual content doesn't matter
-        }else{
-            let params = encodeURIComponent(argument);
-            let uri = 'https://8ball.delegator.com/magic/JSON/' + params
-            try{
-                fetch(uri)
-                    .then((response)=>{return response.json()})
-                    .then((json) =>{msg.channel.send(json['magic']['answer'])})
-            }catch(err){console.log(err)}
-        }
+        logger.info("~8ball initiated")     
+        let params = encodeURIComponent(argument);
+        let uri = 'https://8ball.delegator.com/magic/JSON/' + params
+        fetch(uri)
+            .then((res) => {
+                if(res.ok){return res.json()
+                    .then((json)=>{msg.channel.send(json['magic']['answer'])})
+                }else{
+                    msg.channel.send("You need to ask the magic 8 ball a question to get an answer")
+                }
+            })
     },
+            // .then((json) =>{msg.channel.send(json['magic']['answer'])})   
 
     //function to call Pokemon API
     pokemonCommand : function(msg, argument){
-        let uri = 'https://pokeapi.co/api/v2/'
-        if(argument.length < 1){ // if user didn't input an additional parameter, a random pokemon will be returned
-            try{
-                fetch(uri+'pokemon-species/?limit=0') //get the length of the array (number of pokemon)
-                    .then((response)=>{return response.json()})
-                    .then((json) =>{
-                        let count = json['count']
-                        let num = Math.floor(Math.random()*count)+1; //return a random number between 1 and number of pokemon to be used as index
-                        fetch(uri+'pokemon/'+num) //fetch a random pokemon using the previously obtained number
-                            .then((res)=>{return res.json()})
-                            .then((json)=>{
-                                let name = json['name'].charAt(0).toUpperCase()+json['name'].slice(1);
-                                let img = json['sprites']['front_default'];
-                                msg.channel.send("I choose you, "+name+"!", {files:[img]});
-                            })
-                    })
-            }catch(err){console.log(err)}
+        logger.info("~pokemon initiated")
+        let uri = 'https://pokeapi.co/api/v2/pokemon/'
+        let num;
+        if(argument.length <1){
+            num = Math.floor(Math.random()*807)+1
         }else{
-            fetch(uri+'pokemon/'+argument) //if user input an argument (name or id), that specific pokemon will be returned
-                .then((response)=>{
-                        if(response.ok){
-                            return response.json()
-                                .then((json) =>{
-                                    let name = json['name'].charAt(0).toUpperCase()+json['name'].slice(1);
-                                    let img = json['sprites']['front_default'];
-                                    msg.channel.send(name+" is happy to be chosen by you!", {files:[img]});
-                            })
-                        }
-                        msg.channel.send("Oh noes, your pokemon doesn't exist...");
-                })
+            num = argument
         }
+        fetch(uri + num)
+            .then((res) => {
+                if(res.ok){return res.json()
+                    .then((json)=>{
+                        let name = json['name'].charAt(0).toUpperCase()+json['name'].slice(1);
+                        let img = json['sprites']['front_default'];
+                        msg.channel.send("I choose you, **"+name+"**!", {files:[img]});
+                    })
+                }
+                else{msg.channel.send("Oh noes, your pokemon doesn't exist...")}
+            })
     },
+    
 
     //function to call the weather API
     weatherCommand : function(msg, argument){
+        logger.info("~weather initiated")
         let parsed = parseInt(argument);
         let uri = "https://api.openweathermap.org/data/2.5/weather?";
         let key = "&APPID="+secret.weatherAPI
@@ -89,17 +92,17 @@ module.exports = {
                     .then((json)=>{
                         replyWeather(json, msg);
                     })
+                    }else{
+                        msg.channel.send({embed:{
+                            color:9442302,
+                            title:"Something went wrong.",
+                            description:"You must have a location to continue, please use either city or zipcode as location."
+                                        +"e.g. `~weather 95125` or `weather San Jose`"
+                                        +"\n\nWhen city is used and country code is not present, the default country is US. "
+                                        +"To find a city outside of the US, please provide the two-character country code." 
+                                        +"\ne.g. `~weather Tokyo, JP` - Please note that there is a comma seperating the city and country."
+                        }})
                     }
-                    msg.channel.send({embed:{
-                        color:9442302,
-                        title:"Something went wrong.",
-                        description:"You must have a location to continue, please use either city or zipcode as location."
-                                    +"e.g. `~weather 95125` or `weather San Jose`"
-                                    +"\n\nWhen city is used and country code is not present, the default country is US. "
-                                    +"To find a city outside of the US, please provide the two-character country code." 
-                                    +"\ne.g. `~weather Tokyo, JP` - Please note that there is a comma seperating the city and country."
-                    }})
-                    // msg.channel.send("I can't seem to find this location.\nTry to use <city,country code> format\ne.g. `~weather San Jose` or `~weather Tokyo, JP`\nIf no country is input, the US will be the default country.")
                 })  //if there's an error where the location can't be found, an error will return with further instruction to use the command
         }else{ //if the input is an integer, a zipcode parameter will be used
             fetch(uri+"zip="+argument+key)
@@ -113,6 +116,7 @@ module.exports = {
                 })  //when the zipcode is invalid
         }
     }
+
 }
 
 //Kelvin to Fahrenheit
