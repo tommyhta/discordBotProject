@@ -1,5 +1,6 @@
 const Commands = require("./commands")
 const Help = require("./helpCommand")
+const Yelp = require("./yelpCommands")
 
 module.exports = {
 
@@ -25,7 +26,7 @@ module.exports = {
             case "weather":
                 return Commands.weatherCommand(msg, addArg);
             case "yelp":
-                return Commands.yelpCommand(msg, addArg);
+                return Yelp.yelpCommand(msg, addArg);
         }
     }
 

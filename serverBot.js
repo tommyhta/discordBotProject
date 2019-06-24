@@ -23,5 +23,8 @@ client.on('message', (msg) =>{
         if(msg.mentions.members.get("367805965480886275")!=null){
             msg.channel.send("What did you need my master for?");
         }
+        if(msg.isMemberMentioned(client.user)){
+            msg.channel.send("Hello, **"+msg.member.displayName+"**. You may access a list of available commands by using `~help`")
+        }
     }
 })
