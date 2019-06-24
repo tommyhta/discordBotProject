@@ -1,7 +1,6 @@
 const fetch = require("node-fetch");
+const Utility = require("./utility")
 const secret = require("../config/secret.json")
-const Discord = require("discord.js")
-
 
 
 module.exports = {
@@ -77,7 +76,7 @@ module.exports = {
         let uri = "https://api.openweathermap.org/data/2.5/weather?";
         let key = "&APPID="+secret.weatherAPI
         if(isNaN(parsed)){ //Since the api uses two different parameters keys, user's input must be processed before making the call
-            let arg = formatCommand(argument);// in this case, if input is NOT integers, the parameter will be for city or city,country code
+            let arg = Utility.formatCommand(argument);// in this case, if input is NOT integers, the parameter will be for city or city,country code
             let splitArg = arg.split(',');
             let city = splitArg[0];
             let country = splitArg.slice(1)
@@ -91,7 +90,16 @@ module.exports = {
                         replyWeather(json, msg);
                     })
                     }
-                    msg.channel.send("I can't seem to find this location.\nTry to use <city,country code> format\ne.g. `~weather San Jose` or `~weather Tokyo, JP`\nIf no country is input, the US will be the default country.")
+                    msg.channel.send({embed:{
+                        color:9442302,
+                        title:"Something went wrong.",
+                        description:"You must have a location to continue, please use either city or zipcode as location."
+                                    +"e.g. `~weather 95125` or `weather San Jose`"
+                                    +"\n\nWhen city is used and country code is not present, the default country is US. "
+                                    +"To find a city outside of the US, please provide the two-character country code." 
+                                    +"\ne.g. `~weather Tokyo, JP` - Please note that there is a comma seperating the city and country."
+                    }})
+                    // msg.channel.send("I can't seem to find this location.\nTry to use <city,country code> format\ne.g. `~weather San Jose` or `~weather Tokyo, JP`\nIf no country is input, the US will be the default country.")
                 })  //if there's an error where the location can't be found, an error will return with further instruction to use the command
         }else{ //if the input is an integer, a zipcode parameter will be used
             fetch(uri+"zip="+argument+key)
@@ -104,33 +112,6 @@ module.exports = {
                     msg.channel.send("You entered: "+argument+", which isn't a real zipcode.")
                 })  //when the zipcode is invalid
         }
-    },
-
-    //the function to call the yelp api
-    yelpCommand : function(msg, argument){
-        let uri = "https://api.yelp.com/v3/businesses/search?limit=20";
-        let key = secret.yelpAPI;
-        let arg = formatCommand(argument);
-        let splitArg = arg.split(',');
-        let location = splitArg[0];
-        let term = splitArg.slice(1)
-        if(!term || term.length<1){ //if user doesn't put a second parameter, it will default to food
-            term = "food"
-        }
-        fetch(uri+"&location="+location+"&term="+term, { 
-            method: "GET",
-            headers:{
-                'Authorization': "Bearer "+key
-            }
-        })
-            .then((response)=>{
-                if(response.ok){return response.json()
-                    .then((json)=>{
-                        replyYelp(json, msg, term);
-                    })
-                }
-                msg.channel.send("Something went wrong, you must have a location to continue.\nPlease try again using format ~yelp <location>,<search term>\ne.g. `~yelp san jose` or `~yelp san jose, japanese food`")
-            })  //when there's an error and nothing came in the response due to missing required parameter (location), or search term isn't found.
     }
 }
 
@@ -140,14 +121,6 @@ function kelvinToF(kelvin){
     return temp
 }
 
-//Comebine argument array to one string seperate each term with space
-function formatCommand(arg){
-    let str = '';
-    for(var i = 0; i<arg.length; i++){
-        str+=arg[i]+" "
-    }
-    return str
-}
 
 //function used to write a response to the user
 function replyWeather(json, msg){
@@ -179,69 +152,7 @@ function replyWeather(json, msg){
     )
 }
 
-//this function writes the response to display for users
-function replyYelp(json, msg, term){
-    let length = json['businesses'].length; //while the number of items returned is set, there is a possibility that the result is less than 30
-    let n = Math.floor(Math.random()*length);  //since this command returns a random restaurant, we use this method to get a random number
-    for(var i = 0; i < length; i++){ //in case the input parameter is the name of a specific restaurant, return the first item
-        if(term[0].toLowerCase().trim() == json['businesses'][i]['name'].toLowerCase().trim()){ //unfortunately, the name do have to be exactly as written in the API
-            n = i;
-            break;
-        }
-    }
-    let rest = json['businesses'][n];
-    let imgRating = yelpRating(rest['rating'])
-    const embed = new Discord.RichEmbed()
-        .setTitle("**"+rest['name']+"**")
-        .setURL(rest['url'])
-        .setColor(3447003)
-        .setDescription(
-            "("+rest['review_count']+" reviews)"
-            +"\n\n"+rest['location']['address1']
-            +"\n"+rest['location']['city']+", "+rest['location']['state']+" "+rest['location']['zip_code']
-            +"\n"+rest['display_phone']
-        )
-        .setThumbnail(imgRating)
-        .setImage(rest['image_url'])
-        .setFooter("Powered by Yelp","https://i.imgur.com/GU9gVal.png")
-    msg.channel.send({embed})
-}
 
 
-//determine the rating image base on rating
-function yelpRating(n){
-    imgUrl = '';
-    switch(n){
-        case 0:
-            imgUrl = "https://i.imgur.com/uLDUaw8.png";
-            break;
-        case 1:
-            imgUrl = "https://i.imgur.com/gwmUHUy.png"
-            break;
-        case 1.5:
-            imgUrl = "https://i.imgur.com/G1bfo3F.png";
-            break;
-        case 2:
-            imgUrl = "https://imgur.com/gDN3pdN.png";
-            break;
-        case 2.5:
-            imgUrl = "https://imgur.com/IxE8yaX.png";
-            break;
-        case 3:
-            imgUrl = "https://imgur.com/UdkMz6g.png";
-            break;
-        case 3.5:
-            imgUrl = "https://imgur.com/CwbfFQK.png";
-            break;
-        case 4:
-            imgUrl = "https://imgur.com/CEhIPov.png";
-            break;
-        case 4.5:
-            imgUrl = "https://i.imgur.com/53xR9dZ.png";
-            break;
-        case 5:
-            imgUrl = "https://i.imgur.com/wRhspXo.png";
-            break
-    }
-    return imgUrl
-}
+
+

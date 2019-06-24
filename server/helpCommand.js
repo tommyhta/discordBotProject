@@ -4,7 +4,7 @@ module.exports = {
 
     helpCommand : function(msg){
         msg.channel.send({embed:{
-            color: 3447003,
+            color: 9442302,
             title: "Help Menu",
             description:"This menu lists all the available commands.\nThis menu be accessed by typing `~help`",
             fields:[
@@ -30,7 +30,11 @@ module.exports = {
                 },
                 {
                     name:"**~yelp <location>**",
-                    value:"This command will take either a zipcode or a city and return a random restaurant in that area.\n A search term can also be used after the location and seperated by a comma to narrow down searches. \ne.g `~yelp san jose` or `~yelp san jose, korean bbq`"
+                    value:"This command will take either a zipcode or a city and return a random restaurant in that area."
+                    +"\nA search term can also be used after the location and seperated by a comma to narrow down searches."
+                    +" \ne.g `~yelp san jose` or `~yelp 95125, korean bbq`"
+                    +"\n\nSpecific search of a business can be used by adding a '?' in front of the search term with no space in between."
+                    +"\ne.g. `~yelp san jose, ?tacobell` - The closest match will be return in this case.  When a business has multiple locations, use zipcode to get the closest location."
                 }
             ]
         }}
