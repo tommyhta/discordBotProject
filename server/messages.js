@@ -4,7 +4,7 @@ const Yelp = require("./yelpCommands")
 
 module.exports = {
 
-    processCommand : function(msg){
+    processCommand : function(msg, client){
         let fullCommand = msg.content.substr(1);
         let splitCommand = fullCommand.split(" ");
         let primaryCommand = splitCommand[0];
@@ -27,6 +27,8 @@ module.exports = {
                 return Commands.weatherCommand(msg, addArg);
             case "yelp":
                 return Yelp.yelpCommand(msg, addArg);
+            case "slap":
+                return Commands.slapCommand(msg, client);
         }
     }
 
