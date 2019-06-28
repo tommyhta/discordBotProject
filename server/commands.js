@@ -3,6 +3,8 @@ const Utility = require("./utility")
 const secret = require("../config/secret.json")
 
 const log4js = require('log4js');
+
+
 log4js.configure({
     appenders:{
         commands :{type : 'file', filename: 'application.log', flags : "w", maxLogSize: 10485760, backups: 2, compress: true}
@@ -118,19 +120,41 @@ module.exports = {
     },
 
     slapCommand : function(msg, client){
+        let uri = "https://api.giphy.com/v1/gifs/search?api_key="+secret.giphyAPI+"&q=slap";
         if(!msg.mentions.members.first()){
             msg.channel.send("You can't just slap nobody, please decide who you want to slap.")
         }else{
+            let message;
             let name = msg.mentions.members.first()['nickname'];
             if(!name) name = msg.mentions.members.first()['user']['username']
-            if(msg.isMemberMentioned(msg.member)){
-                msg.channel.send("Okay.. but why though?", {files: ['https://imgur.com/XXIsxYG.gif']})
-            }else if(msg.isMemberMentioned(client.user)){
-                msg.channel.send("Wao, why are you rude?", {files: ['https://imgur.com/XXIsxYG.gif']})
-            }
-            else{
-                msg.channel.send("**"+msg.member.displayName + "** has just slapped you, **"+ name+"**.")
-            }
+            if(msg.isMemberMentioned(msg.member)) message = "Okay.. but why though?"
+            else if(msg.isMemberMentioned(client.user)) message = "Wao, why are you rude?"
+            else message = "**"+msg.member.displayName + "** has just slapped you, **"+ name+"**."
+
+            fetch(uri)
+                .then((response)=>{
+                    if(response.ok){return response.json()
+                        .then((json)=>{
+                            let count = json['data'].length;
+                            let n = Math.floor(Math.random()*count)+1;
+                            let img = json['data'][n]['images']['downsized']['url']
+                        
+                            msg.channel.send({embed:{
+                                color: 16098851,
+                                title: message,
+                                image:{
+                                    url: img
+                                },
+                                footer:{
+                                    icon_url: "https://imgur.com/LatR62i.png",
+                                    text:"Powered by Giphy"
+                                }     
+                            }})
+                        })
+                    }
+                    msg.channel.send("Something went wrong with the API, please try again later.")
+                })
+
         }
     }
 
