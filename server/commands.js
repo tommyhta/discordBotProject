@@ -115,6 +115,23 @@ module.exports = {
                     msg.channel.send("You entered: "+argument+", which isn't a real zipcode.")
                 })  //when the zipcode is invalid
         }
+    },
+
+    slapCommand : function(msg, client){
+        if(!msg.mentions.members.first()){
+            msg.channel.send("You can't just slap nobody, please decide who you want to slap.")
+        }else{
+            let name = msg.mentions.members.first()['nickname'];
+            if(!name) name = msg.mentions.members.first()['user']['username']
+            if(msg.isMemberMentioned(msg.member)){
+                msg.channel.send("Okay.. but why though?", {files: ['https://imgur.com/XXIsxYG.gif']})
+            }else if(msg.isMemberMentioned(client.user)){
+                msg.channel.send("Wao, why are you rude?", {files: ['https://imgur.com/XXIsxYG.gif']})
+            }
+            else{
+                msg.channel.send("**"+msg.member.displayName + "** has just slapped you, **"+ name+"**.")
+            }
+        }
     }
 
 }
