@@ -15,12 +15,13 @@ log4js.configure({
 const logger = log4js.getLogger('serverBot')
 
 const Messages = require("./server/messages")
+const Utility = require("./server/utility")
 
 client.login(secret.discordToken)
 
 client.on("ready", ()=>{
     logger.info("Connected as " + client.user.tag)
-    client.user.setActivity("Korean Drama", {type:"WATCHING"})
+    Utility.fetchStatus(client);
 })
 
 client.on('message', (msg) =>{

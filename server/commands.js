@@ -120,7 +120,6 @@ module.exports = {
     },
 
     slapCommand : function(msg, client){
-        let uri = "https://api.giphy.com/v1/gifs/search?api_key="+secret.giphyAPI+"&q=slap";
         if(!msg.mentions.members.first()){
             msg.channel.send("You can't just slap nobody, please decide who you want to slap.")
         }else{
@@ -129,32 +128,8 @@ module.exports = {
             if(!name) name = msg.mentions.members.first()['user']['username']
             if(msg.isMemberMentioned(msg.member)) message = "Okay.. but why though?"
             else if(msg.isMemberMentioned(client.user)) message = "Wao, why are you rude?"
-            else message = "**"+msg.member.displayName + "** has just slapped you, **"+ name+"**."
-
-            fetch(uri)
-                .then((response)=>{
-                    if(response.ok){return response.json()
-                        .then((json)=>{
-                            let count = json['data'].length;
-                            let n = Math.floor(Math.random()*count)+1;
-                            let img = json['data'][n]['images']['downsized']['url']
-                        
-                            msg.channel.send({embed:{
-                                color: 16098851,
-                                title: message,
-                                image:{
-                                    url: img
-                                },
-                                footer:{
-                                    icon_url: "https://imgur.com/LatR62i.png",
-                                    text:"Powered by Giphy"
-                                }     
-                            }})
-                        })
-                    }
-                    msg.channel.send("Something went wrong with the API, please try again later.")
-                })
-
+            else message = "**"+msg.member.displayName + "** wanted to slap you, **"+ name+"**, so here it is..!"       
+            msg.channel.send(message, {files:[whichSlap()]})
         }
     }
 
@@ -198,6 +173,24 @@ function replyWeather(json, msg){
 }
 
 
-
+function whichSlap(){
+    var slaps = [
+        "https://imgur.com/XXIsxYG.gif",
+        "https://imgur.com/s82278Y.gif",
+        "https://imgur.com/kS5tWMX.gif",
+        "https://imgur.com/Xnltjzk.gif",
+        "https://imgur.com/Mjm7OJD.gif",
+        "https://imgur.com/Z0Xishk.gif",
+        "https://imgur.com/uKkrsih.gif",
+        "https://imgur.com/fURd5OE.gif",
+        "https://imgur.com/yozATGf.gif",
+        "https://imgur.com/32g3rcw.gif",
+        "https://imgur.com/jYp4sG8.gif",
+        "https://imgur.com/cRFdKIX.gif",
+        "https://imgur.com/I3buiPf.gif"
+    ]
+    var n = Math.floor(Math.random()*slaps.length);
+    return slaps[n]
+}
 
 
