@@ -10,6 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "discord.js": "^11.5.1",
+    "lodash.remove": "^4.7.0",
     "node-fetch": "^2.6.0"
   }
 }
