@@ -1,95 +1,112 @@
 const fetch = require("node-fetch");
+const Utility = require("./utility")
 const secret = require("../config/secret.json")
-const Discord = require("discord.js")
+
+const log4js = require('log4js');
+
+
+log4js.configure({
+    appenders:{
+        commands :{type : 'file', filename: 'application.log', flags : "w", maxLogSize: 10485760, backups: 2, compress: true}
+    },
+    categories :{
+        default: { appenders: ["commands"], level: 'info'}
+    }
+})
+const logger = log4js.getLogger('commands')
 
 module.exports = {
  
+    //simple dice toss
     rollCommand : function(msg){
-        let n1 = Math.floor(Math.random()*6)+1;
+        logger.info("~roll initiated")
+        let n1 = Math.floor(Math.random()*6)+1; // randomly generate a number between 1 and 6 
         let n2 = Math.floor(Math.random()*6)+1;
-        msg.channel.send("```\u{1F3B2} "+msg.author.username+" rolled a " + n1 + " and " + n2 + ".\nThe total is "+(n1+n2)+".```")
+        msg.channel.send("\u{1F3B2} **"+msg.member.displayName+"** rolled " + n1 + " and " + n2 + ".\nThe total is **"+(n1+n2)+"**.")
     },
 
+    //simple coin toss function
     coinCommand : function(msg){
+        logger.info("~coin initiated")
         let face = '';
-        let n = Math.floor(Math.random()*2);
-        n==0 ? face="head":face="tail"
-        msg.channel.send("```"+msg.author.username+" flipped a coin and got "+face+"!```")
+        let n = Math.floor(Math.random()*2); //randomly return 0 or 1
+        n==0 ? face="head":face="tail" // if 0, it's head, otherwise, it's tail
+        msg.channel.send("**"+msg.member.displayName+"** flipped a coin and got **"+face+"**!")
     },
 
+    // function to call magic 8 ball API
     magicBall : function(msg, argument){
-        if(argument.length < 1){
-            msg.channel.send("```You need to ask magic eight ball a question to get an answer.```")
-        }else{
-            let params = encodeURIComponent(argument);
-            let uri = 'https://8ball.delegator.com/magic/JSON/' + params
-            try{
-                fetch(uri)
-                    .then((response)=>{return response.json()})
-                    .then((json) =>{msg.channel.send("```"+ json['magic']['answer'] +"```")})
-            }catch(err){console.log(err)}
-        }
+        logger.info("~8ball initiated")     
+        let params = encodeURIComponent(argument);
+        let uri = 'https://8ball.delegator.com/magic/JSON/' + params
+        fetch(uri)
+            .then((res) => {
+                if(res.ok){return res.json()
+                    .then((json)=>{msg.channel.send(json['magic']['answer'])})
+                }else{
+                    msg.channel.send("You need to ask the magic 8 ball a question to get an answer")
+                }
+            })
     },
+            // .then((json) =>{msg.channel.send(json['magic']['answer'])})   
 
+    //function to call Pokemon API
     pokemonCommand : function(msg, argument){
-        let uri = 'https://pokeapi.co/api/v2/'
-        if(argument.length < 1){
-            try{
-                fetch(uri+'pokemon-species/?limit=0')
-                    .then((response)=>{return response.json()})
-                    .then((json) =>{
-                        let count = json['count']
-                        let num = Math.floor(Math.random()*count)+1;
-                        fetch(uri+'pokemon/'+num)
-                            .then((res)=>{return res.json()})
-                            .then((json)=>{
-                                let name = json['name'].charAt(0).toUpperCase()+json['name'].slice(1);
-                                let img = json['sprites']['front_default'];
-                                msg.channel.send("```I choose you, "+name+"!```", {files:[img]});
-                            })
-                    })
-            }catch(err){console.log(err)}
+        logger.info("~pokemon initiated")
+        let uri = 'https://pokeapi.co/api/v2/pokemon/'
+        let num;
+        if(argument.length <1){
+            num = Math.floor(Math.random()*807)+1
         }else{
-            fetch(uri+'pokemon/'+argument)
-                .then((response)=>{
-                        if(response.ok){
-                            return response.json()
-                                .then((json) =>{
-                                    let name = json['name'].charAt(0).toUpperCase()+json['name'].slice(1);
-                                    let img = json['sprites']['front_default'];
-                                    msg.channel.send("```"+name+" is happy to be chosen by you!```", {files:[img]});
-                            })
-                        }
-                        msg.channel.send("```Oh noes, your pokemon doesn't exist...```");
-                })
+            num = argument
         }
+        fetch(uri + num)
+            .then((res) => {
+                if(res.ok){return res.json()
+                    .then((json)=>{
+                        let name = json['name'].charAt(0).toUpperCase()+json['name'].slice(1);
+                        let img = json['sprites']['front_default'];
+                        msg.channel.send("I choose you, **"+name+"**!", {files:[img]});
+                    })
+                }
+                else{msg.channel.send("Oh noes, your pokemon doesn't exist...")}
+            })
     },
+    
 
+    //function to call the weather API
     weatherCommand : function(msg, argument){
+        logger.info("~weather initiated")
         let parsed = parseInt(argument);
         let uri = "https://api.openweathermap.org/data/2.5/weather?";
         let key = "&APPID="+secret.weatherAPI
-        if(isNaN(parsed)){
-            let arg = formatCommand(argument);
+        if(isNaN(parsed)){ //Since the api uses two different parameters keys, user's input must be processed before making the call
+            let arg = Utility.formatCommand(argument);// in this case, if input is NOT integers, the parameter will be for city or city,country code
             let splitArg = arg.split(',');
             let city = splitArg[0];
             let country = splitArg.slice(1)
-
-            if(!country || country.length < 1){
+            if(!country || country.length < 1){ //if there's no country parameter is added, US is the default
                 country = "US"
             }
-
             fetch(uri+"q="+city+","+country+key)
                 .then((res)=>{
                     if(res.ok){return res.json()
                     .then((json)=>{
                         replyWeather(json, msg);
                     })
+                    }else{
+                        msg.channel.send({embed:{
+                            color:9442302,
+                            title:"Something went wrong.",
+                            description:"You must have a location to continue, please use either city or zipcode as location."
+                                        +"e.g. `~weather 95125` or `weather San Jose`"
+                                        +"\n\nWhen city is used and country code is not present, the default country is US. "
+                                        +"To find a city outside of the US, please provide the two-character country code." 
+                                        +"\ne.g. `~weather Tokyo, JP` - Please note that there is a comma seperating the city and country."
+                        }})
                     }
-                    msg.channel.send("```I can't seem to find this location.\n\nTry to use <city,country code> format\n\ne.g. ~weather San Jose, US or Tokyo, JP\n\nIf no country is input, the US will be the default country.```")
-                })
-
-        }else{
+                })  //if there's an error where the location can't be found, an error will return with further instruction to use the command
+        }else{ //if the input is an integer, a zipcode parameter will be used
             fetch(uri+"zip="+argument+key)
                 .then((response)=>{
                     if(response.ok){return response.json()
@@ -97,52 +114,35 @@ module.exports = {
                             replyWeather(json, msg);
                         })
                     }
-                    msg.channel.send("```You entered: "+argument+", which isn't a real zipcode.```")
-                })
+                    msg.channel.send("You entered: "+argument+", which isn't a real zipcode.")
+                })  //when the zipcode is invalid
         }
     },
 
-    yelpCommand : function(msg, argument){
-        let uri = "https://api.yelp.com/v3/businesses/search?limit=20";
-        let key = secret.yelpAPI;
-        let arg = formatCommand(argument);
-        let splitArg = arg.split(',');
-        let location = splitArg[0];
-        let term = splitArg.slice(1)
-        if(!term || term.length<1){
-            term = "food"
+    slapCommand : function(msg, client){
+        if(!msg.mentions.members.first()){
+            msg.channel.send("You can't just slap nobody, please decide who you want to slap.")
+        }else{
+            let message;
+            let name = msg.mentions.members.first()['nickname'];
+            if(!name) name = msg.mentions.members.first()['user']['username']
+            if(msg.isMemberMentioned(msg.member)) message = "Okay.. but why though?"
+            else if(msg.isMemberMentioned(client.user)) message = "Wao, why are you rude?"
+            else message = "**"+msg.member.displayName + "** wanted to slap you, **"+ name+"**, so here it is..!"       
+            msg.channel.send(message, {files:[whichSlap()]})
         }
-        fetch(uri+"&location="+location+"&term="+term, {
-            method: "GET",
-            headers:{
-                'Authorization': "Bearer "+key
-            }
-        })
-            .then((response)=>{
-                if(response.ok){return response.json()
-                    .then((json)=>{
-                        replyYelp(json, msg);
-                    })
-                }
-                msg.channel.send("```Something went wrong, you must have a location to continue.\nPlease try again using format ~yelp <location>,<search term>\ne.g. ~yelp san jose or ~yelp san jose, japanese food```")
-            })
     }
+
 }
 
-
+//Kelvin to Fahrenheit
 function kelvinToF(kelvin){
     let temp = (kelvin - 273.15)*9/5 + 32
     return temp
 }
 
-function formatCommand(arg){
-    let str = '';
-    for(var i = 0; i<arg.length; i++){
-        str+=arg[i]+" "
-    }
-    return str
-}
 
+//function used to write a response to the user
 function replyWeather(json, msg){
     let city = json['name']
     let country = json['sys']['country']
@@ -172,62 +172,25 @@ function replyWeather(json, msg){
     )
 }
 
-function replyYelp(json, msg){
-    let length = json['businesses'].length;
-    let n = Math.floor(Math.random()*length);
-    let rest = json['businesses'][n];
-    let imgRating = yelpRating(rest['rating'])
 
-    const embed = new Discord.RichEmbed()
-        .setTitle("**"+rest['name']+"**")
-        .setURL(rest['url'])
-        .setColor(3447003)
-        .setDescription(
-            "("+rest['review_count']+" reviews)"
-            +"\n\n"+rest['location']['address1']
-            +"\n"+rest['location']['city']+", "+rest['location']['state']+" "+rest['location']['zip_code']
-            +"\n"+rest['display_phone']
-        )
-        .setThumbnail(imgRating)
-        .setImage(rest['image_url'])
-        .setFooter("Powered by Yelp","https://i.imgur.com/GU9gVal.png")
-
-    msg.channel.send({embed})
+function whichSlap(){
+    var slaps = [
+        "https://imgur.com/XXIsxYG.gif",
+        "https://imgur.com/s82278Y.gif",
+        "https://imgur.com/kS5tWMX.gif",
+        "https://imgur.com/Xnltjzk.gif",
+        "https://imgur.com/Mjm7OJD.gif",
+        "https://imgur.com/Z0Xishk.gif",
+        "https://imgur.com/uKkrsih.gif",
+        "https://imgur.com/fURd5OE.gif",
+        "https://imgur.com/yozATGf.gif",
+        "https://imgur.com/32g3rcw.gif",
+        "https://imgur.com/jYp4sG8.gif",
+        "https://imgur.com/cRFdKIX.gif",
+        "https://imgur.com/I3buiPf.gif"
+    ]
+    var n = Math.floor(Math.random()*slaps.length);
+    return slaps[n]
 }
 
-function yelpRating(n){
-    imgUrl = '';
-    switch(n){
-        case 0:
-            imgUrl = "https://i.imgur.com/uLDUaw8.png";
-            break;
-        case 1:
-            imgUrl = "https://i.imgur.com/gwmUHUy.png"
-            break;
-        case 1.5:
-            imgUrl = "https://i.imgur.com/G1bfo3F.png";
-            break;
-        case 2:
-            imgUrl = "https://imgur.com/gDN3pdN.png";
-            break;
-        case 2.5:
-            imgUrl = "https://imgur.com/IxE8yaX.png";
-            break;
-        case 3:
-            imgUrl = "https://imgur.com/UdkMz6g.png";
-            break;
-        case 3.5:
-            imgUrl = "https://imgur.com/CwbfFQK.png";
-            break;
-        case 4:
-            imgUrl = "https://imgur.com/CEhIPov.png";
-            break;
-        case 4.5:
-            imgUrl = "https://i.imgur.com/53xR9dZ.png";
-            break;
-        case 5:
-            imgUrl = "https://i.imgur.com/wRhspXo.png";
-            break
-    }
-    return imgUrl
-}
+
