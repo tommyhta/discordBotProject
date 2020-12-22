@@ -25,7 +25,6 @@ module.exports = {
             "Rose taking shots of soju",
             "Taeyeon unnie eating ice cream",
             "Running Man",
-            "everyone failing their enchants",
             "Anime",
             "Cat videos",
             "Netflix",

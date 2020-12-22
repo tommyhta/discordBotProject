@@ -126,8 +126,8 @@ module.exports = {
             let message;
             let name = msg.mentions.members.first()['nickname'];
             if(!name) name = msg.mentions.members.first()['user']['username']
-            if(msg.isMemberMentioned(msg.member)) message = "Okay.. but why though?"
-            else if(msg.isMemberMentioned(client.user)) message = "Wao, why are you rude?"
+            if(msg.mentions.has(msg.member.id)) message = "Okay.. but why though?"
+            else if(msg.mentions.has(client.user.id)) message = "Wao, why are you rude?"
             else message = "**"+msg.member.displayName + "** wanted to slap you, **"+ name+"**, so here it is..!"       
             msg.channel.send(message, {files:[whichSlap()]})
         }

@@ -85,7 +85,7 @@ function replyYelp(json, msg, isSearched){
     let rest = json['businesses'][n];
     let imgRating = yelpRating(rest['rating'])
 
-    const embed = new Discord.RichEmbed()
+    const embed = new Discord.MessageEmbed()
         .setTitle("**"+rest['name']+"**")
         .setURL(rest['url'])
         .setColor(9442302)
