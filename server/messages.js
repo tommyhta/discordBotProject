@@ -1,6 +1,7 @@
 const Commands = require("./commands")
 const Help = require("./helpCommand")
 const Yelp = require("./yelpCommands")
+const Play = require("./play")
 
 module.exports = {
 
@@ -29,6 +30,9 @@ module.exports = {
                 return Yelp.yelpCommand(msg, addArg);
             case "slap":
                 return Commands.slapCommand(msg, client);
+
+            case "play":
+                return Play.playMusic(msg,argument);
         }
     }
 

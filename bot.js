@@ -3,16 +3,16 @@ const secret = require("./config/secret.json");
 const Discord = require("discord.js");
 const client = new Discord.Client();
 
-const log4js = require('log4js');
-log4js.configure({
-    appenders:{
-        serverBot :{type : 'file', filename: 'application.log', flags : "w"}
-    },
-    categories :{
-        default: { appenders: ["serverBot"], level: 'info'}
-    }
-})
-const logger = log4js.getLogger('serverBot')
+// const log4js = require('log4js');
+// log4js.configure({
+//     appenders:{
+//         serverBot :{type : 'file', filename: 'application.log', flags : "w"}
+//     },
+//     categories :{
+//         default: { appenders: ["serverBot"], level: 'info'}
+//     }
+// })
+// const logger = log4js.getLogger('serverBot')
 
 const Messages = require("./server/messages")
 const Utility = require("./server/utility")
@@ -20,7 +20,7 @@ const Utility = require("./server/utility")
 client.login(secret.discordToken)
 
 client.on("ready", ()=>{
-    logger.info("Connected as " + client.user.tag)
+    console.log("Connected as " + client.user.tag)
     Utility.fetchStatus(client);
 })
 
@@ -35,12 +35,13 @@ client.on('message', (msg) =>{
         if(msg.mentions.members.get("367805965480886275")!=null){
             // msg.channel.send("What did you need my master for?");
         }
-        if(msg.isMemberMentioned(client.user)){
+        console.log(client.user.id)
+        if(msg.mentions.has(client.user)){
             msg.channel.send("Hello, **"+msg.member.displayName+"**. You may access a list of available commands by using `~help`")
         }
     }
 })
 
 client.on('disconnect', () =>{
-    logger.info(client.user.tag + " is disconnected.");
+    console.log(client.user.tag + " is disconnected.");
 })

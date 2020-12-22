@@ -2,24 +2,24 @@ const fetch = require("node-fetch");
 const Utility = require("./utility")
 const secret = require("../config/secret.json")
 
-const log4js = require('log4js');
+// const log4js = require('log4js');
 
 
-log4js.configure({
-    appenders:{
-        commands :{type : 'file', filename: 'application.log', flags : "w", maxLogSize: 10485760, backups: 2, compress: true}
-    },
-    categories :{
-        default: { appenders: ["commands"], level: 'info'}
-    }
-})
-const logger = log4js.getLogger('commands')
+// log4js.configure({
+//     appenders:{
+//         commands :{type : 'file', filename: 'application.log', flags : "w", maxLogSize: 10485760, backups: 2, compress: true}
+//     },
+//     categories :{
+//         default: { appenders: ["commands"], level: 'info'}
+//     }
+// })
+// const logger = log4js.getLogger('commands')
 
 module.exports = {
  
     //simple dice toss
     rollCommand : function(msg){
-        logger.info("~roll initiated")
+        // logger.info("~roll initiated")
         let n1 = Math.floor(Math.random()*6)+1; // randomly generate a number between 1 and 6 
         let n2 = Math.floor(Math.random()*6)+1;
         msg.channel.send("\u{1F3B2} **"+msg.member.displayName+"** rolled " + n1 + " and " + n2 + ".\nThe total is **"+(n1+n2)+"**.")
@@ -27,7 +27,7 @@ module.exports = {
 
     //simple coin toss function
     coinCommand : function(msg){
-        logger.info("~coin initiated")
+        // logger.info("~coin initiated")
         let face = '';
         let n = Math.floor(Math.random()*2); //randomly return 0 or 1
         n==0 ? face="head":face="tail" // if 0, it's head, otherwise, it's tail
@@ -36,7 +36,7 @@ module.exports = {
 
     // function to call magic 8 ball API
     magicBall : function(msg, argument){
-        logger.info("~8ball initiated")     
+        // logger.info("~8ball initiated")     
         let params = encodeURIComponent(argument);
         let uri = 'https://8ball.delegator.com/magic/JSON/' + params
         fetch(uri)
@@ -52,7 +52,7 @@ module.exports = {
 
     //function to call Pokemon API
     pokemonCommand : function(msg, argument){
-        logger.info("~pokemon initiated")
+        // logger.info("~pokemon initiated")
         let uri = 'https://pokeapi.co/api/v2/pokemon/'
         let num;
         if(argument.length <1){
@@ -76,7 +76,7 @@ module.exports = {
 
     //function to call the weather API
     weatherCommand : function(msg, argument){
-        logger.info("~weather initiated")
+        // logger.info("~weather initiated")
         let parsed = parseInt(argument);
         let uri = "https://api.openweathermap.org/data/2.5/weather?";
         let key = "&APPID="+secret.weatherAPI
@@ -126,8 +126,8 @@ module.exports = {
             let message;
             let name = msg.mentions.members.first()['nickname'];
             if(!name) name = msg.mentions.members.first()['user']['username']
-            if(msg.isMemberMentioned(msg.member)) message = "Okay.. but why though?"
-            else if(msg.isMemberMentioned(client.user)) message = "Wao, why are you rude?"
+            if(msg.mentions.has(msg.member.id)) message = "Okay.. but why though?"
+            else if(msg.mentions.has(client.user.id)) message = "Wao, why are you rude?"
             else message = "**"+msg.member.displayName + "** wanted to slap you, **"+ name+"**, so here it is..!"       
             msg.channel.send(message, {files:[whichSlap()]})
         }
