@@ -9,8 +9,10 @@ const Utility = require("./server/utility")
 
 if(!process.env.discordToken){ 
     secret = require("./config/secret.json");
+    console.log("no process, local environment")
 }else{
     secret = process.env;
+    console.log("process found, heroku", secret.me)
 }
  
 
