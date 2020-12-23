@@ -1,4 +1,4 @@
-const secret = require("./config/secret.json");
+const secretF = require("./config/secret.json");
 
 const Discord = require("discord.js");
 const client = new Discord.Client();
@@ -6,6 +6,13 @@ const client = new Discord.Client();
 
 const Messages = require("./server/messages")
 const Utility = require("./server/utility")
+
+if(secretF){
+    secret = secretF;
+}else{
+    secret = process.env
+}
+ 
 
 client.login(secret.discordToken)
 
@@ -25,6 +32,7 @@ client.on('message', (msg) =>{
         if(msg.mentions.members.get(secret.me)!=null){
             msg.channel.send("What did you need my master for?");
         }
+
         if(msg.mentions.has(client.user)){
             msg.channel.send("Hello, **"+msg.member.displayName+"**. You may access a list of available commands by using `~help`")
         }
