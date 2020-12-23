@@ -1,4 +1,4 @@
-// const secret = require("./config/secret.json");
+const secret = require("./config/secret.json");
 
 const Discord = require("discord.js");
 const client = new Discord.Client();
@@ -7,14 +7,6 @@ const client = new Discord.Client();
 const Messages = require("./server/messages")
 const Utility = require("./server/utility")
 
-if(!process.env.discordToken){ 
-    secret = require("./config/secret.json");
-    console.log("no process, local environment")
-}else{
-    secret = process.env;
-    console.log("process found, heroku", secret.me)
-}
- 
 
 client.login(secret.discordToken)
 
