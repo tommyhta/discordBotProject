@@ -1,12 +1,6 @@
 const fetch = require("node-fetch");
 const Utility = require("./utility")
-const secretF = require("../config/secret.json")
-
-if(secretF){
-    secret = secretF;
-}else{
-    secret = process.env
-}
+const secret = require("../config/secret.json")
 
 module.exports = {
  

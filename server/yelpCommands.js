@@ -1,14 +1,8 @@
-const secretF = require("../config/secret.json");
+const secret = require("../config/secret.json");
 const Utility = require("./utility");
 
 const fetch = require("node-fetch");
 const Discord = require("discord.js");
-
-if(secretF){
-    secret = secretF;
-}else{
-    secret = process.env
-}
 
 const N = 50;
 const uri = "https://api.yelp.com/v3/businesses/search?limit="+N;
