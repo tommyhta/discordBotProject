@@ -26,12 +26,12 @@ module.exports = {
         ]
 
         let n = Math.floor(Math.random()*statuses.length)
-        let status = statuses[n]
+        let status = statuses[n] + " ~help"
         client.user.setActivity(status, {type:"WATCHING"})
         console.log("Status: "+status)
         setInterval(()=>{
             let n = Math.floor(Math.random()*statuses.length)
-            let status = statuses[n]
+            let status = statuses[n] + " ~help"
             client.user.setActivity(status, {type:"WATCHING"})
             console.log("Status: "+status)
         }, 600000)
