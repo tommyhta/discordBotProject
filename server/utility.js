@@ -1,14 +1,3 @@
-// const log4js = require('log4js');
-// log4js.configure({
-//     appenders:{
-//         utility :{type : 'file', filename: 'application.log', flags : "w"}
-//     },
-//     categories :{
-//         default: { appenders: ["utility"], level: 'info'}
-//     }
-// })
-// const logger = log4js.getLogger('utility')
-
 module.exports = {
     
     //Comebine argument array to one string seperate each term with space
@@ -39,13 +28,11 @@ module.exports = {
         let n = Math.floor(Math.random()*statuses.length)
         let status = statuses[n]
         client.user.setActivity(status, {type:"WATCHING"})
-        // logger.info("Status changed to: " + status)
         console.log("Status: "+status)
         setInterval(()=>{
             let n = Math.floor(Math.random()*statuses.length)
             let status = statuses[n]
             client.user.setActivity(status, {type:"WATCHING"})
-            // logger.info("Status changed to: " + status)
             console.log("Status: "+status)
         }, 600000)
     }

@@ -4,17 +4,6 @@ const Utility = require("./utility");
 const fetch = require("node-fetch");
 const Discord = require("discord.js");
 
-// const log4js = require('log4js');
-// log4js.configure({
-//     appenders:{
-//         yelpCommand :{type : 'file', filename: 'application.log', flags : "w", maxLogSize: 10485760, backups: 2, compress: true}
-//     },
-//     categories :{
-//         default: { appenders: ["yelpCommand"], level: 'info'}
-//     }
-// })
-// const logger = log4js.getLogger('yelpCommand')
-
 const N = 50;
 const uri = "https://api.yelp.com/v3/businesses/search?limit="+N;
 const key = secret.yelpAPI;
@@ -33,7 +22,6 @@ module.exports = {
     
     //the function to call the yelp api
     yelpCommand : function(msg, argument){
-        // logger.info("~yelp initiated")
         let arg = Utility.formatCommand(argument);
         let splitArg = arg.split(',');
         let location = splitArg[0];
