@@ -3,16 +3,6 @@ const secret = require("./config/secret.json");
 const Discord = require("discord.js");
 const client = new Discord.Client();
 
-// const log4js = require('log4js');
-// log4js.configure({
-//     appenders:{
-//         serverBot :{type : 'file', filename: 'application.log', flags : "w"}
-//     },
-//     categories :{
-//         default: { appenders: ["serverBot"], level: 'info'}
-//     }
-// })
-// const logger = log4js.getLogger('serverBot')
 
 const Messages = require("./server/messages")
 const Utility = require("./server/utility")
@@ -32,10 +22,9 @@ client.on('message', (msg) =>{
         return Messages.processCommand(msg, client);
     }
     if(msg.mentions){
-        if(msg.mentions.members.get("367805965480886275")!=null){
-            // msg.channel.send("What did you need my master for?");
+        if(msg.mentions.members.get(secret.me)!=null){
+            msg.channel.send("What did you need my master for?");
         }
-        console.log(client.user.id)
         if(msg.mentions.has(client.user)){
             msg.channel.send("Hello, **"+msg.member.displayName+"**. You may access a list of available commands by using `~help`")
         }

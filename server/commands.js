@@ -2,24 +2,12 @@ const fetch = require("node-fetch");
 const Utility = require("./utility")
 const secret = require("../config/secret.json")
 
-// const log4js = require('log4js');
 
-
-// log4js.configure({
-//     appenders:{
-//         commands :{type : 'file', filename: 'application.log', flags : "w", maxLogSize: 10485760, backups: 2, compress: true}
-//     },
-//     categories :{
-//         default: { appenders: ["commands"], level: 'info'}
-//     }
-// })
-// const logger = log4js.getLogger('commands')
 
 module.exports = {
  
     //simple dice toss
     rollCommand : function(msg){
-        // logger.info("~roll initiated")
         let n1 = Math.floor(Math.random()*6)+1; // randomly generate a number between 1 and 6 
         let n2 = Math.floor(Math.random()*6)+1;
         msg.channel.send("\u{1F3B2} **"+msg.member.displayName+"** rolled " + n1 + " and " + n2 + ".\nThe total is **"+(n1+n2)+"**.")
@@ -27,7 +15,6 @@ module.exports = {
 
     //simple coin toss function
     coinCommand : function(msg){
-        // logger.info("~coin initiated")
         let face = '';
         let n = Math.floor(Math.random()*2); //randomly return 0 or 1
         n==0 ? face="head":face="tail" // if 0, it's head, otherwise, it's tail
@@ -35,8 +22,7 @@ module.exports = {
     },
 
     // function to call magic 8 ball API
-    magicBall : function(msg, argument){
-        // logger.info("~8ball initiated")     
+    magicBall : function(msg, argument){    
         let params = encodeURIComponent(argument);
         let uri = 'https://8ball.delegator.com/magic/JSON/' + params
         fetch(uri)
@@ -52,7 +38,6 @@ module.exports = {
 
     //function to call Pokemon API
     pokemonCommand : function(msg, argument){
-        // logger.info("~pokemon initiated")
         let uri = 'https://pokeapi.co/api/v2/pokemon/'
         let num;
         if(argument.length <1){
@@ -76,7 +61,6 @@ module.exports = {
 
     //function to call the weather API
     weatherCommand : function(msg, argument){
-        // logger.info("~weather initiated")
         let parsed = parseInt(argument);
         let uri = "https://api.openweathermap.org/data/2.5/weather?";
         let key = "&APPID="+secret.weatherAPI
