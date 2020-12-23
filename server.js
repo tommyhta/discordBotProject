@@ -1,4 +1,4 @@
-const secretF = require("./config/secret.json");
+// const secret = require("./config/secret.json");
 
 const Discord = require("discord.js");
 const client = new Discord.Client();
@@ -7,10 +7,10 @@ const client = new Discord.Client();
 const Messages = require("./server/messages")
 const Utility = require("./server/utility")
 
-if(secretF){
-    secret = secretF;
+if(!process.env.discordToken){ 
+    secret = require("./config/secret.json");
 }else{
-    secret = process.env
+    secret = process.env;
 }
  
 

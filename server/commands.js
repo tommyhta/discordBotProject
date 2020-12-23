@@ -1,13 +1,12 @@
 const fetch = require("node-fetch");
 const Utility = require("./utility")
-const secretF = require("../config/secret.json")
+// const secret = require("../config/secret.json")
 
-if(secretF){
-    secret = secretF;
+if(!process.env.discordToken){ 
+    secret = require("../config/secret.json");
 }else{
-    secret = process.env
+    secret = process.env;
 }
-
 module.exports = {
  
     //simple dice toss
