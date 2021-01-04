@@ -7,12 +7,13 @@ const client = new Discord.Client();
 const Messages = require("./server/messages")
 const Utility = require("./server/utility")
 
+
 if(!process.env.discordToken){ 
     secret = require("./config/secret.json");
     console.log("no process, local environment")
 }else{
     secret = process.env;
-    console.log("process found, heroku", secret.me)
+    console.log("process found, heroku")
 }
  
 
@@ -32,7 +33,7 @@ client.on('message', (msg) =>{
     }
     if(msg.mentions){
         if(msg.mentions.members.get(secret.me)!=null){
-            msg.channel.send("What did you need my master for?");
+            // msg.channel.send("What did you need my master for?");
         }
 
         if(msg.mentions.has(client.user)){

@@ -11,8 +11,8 @@ module.exports = {
     fetchStatus : function(client){
         let statuses = [
             "Korean Drama",
-            "Rose taking shots of soju",
-            "Taeyeon unnie eating ice cream",
+            // "Rose taking shots of soju",
+            // "Taeyeon unnie eating ice cream",
             "Running Man",
             "Anime",
             "Cat videos",
