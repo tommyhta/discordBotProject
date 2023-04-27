@@ -29,4 +29,4 @@ e.g ~yelp san jose or ~yelp 95125, korean bbq
 Specific search of a business can be used by adding a '?' in front of the search term with no space in between.
 e.g. ~yelp san jose, ?tacobell - The closest match will be return in this case. When a business has multiple locations, use zipcode to get the closest location.    
 
-This bot can be invited at https://discordapp.com/api/oauth2/authorize?client_id=591099636270235648&permissions=0&scope=bot  
+This bot can be invited at <del>https://discordapp.com/api/oauth2/authorize?client_id=591099636270235648&permissions=0&scope=bot</del> *free hosting service policy changed, this bot is currently not live
